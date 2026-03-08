@@ -1,0 +1,144 @@
+/*
+ *	Mark's Code Fractal CFLib JavaFX 3.1 Widget and Support Library
+ *
+ *	Copyright 2016-2026 Mark Stephen Sobkow
+ *
+ *	This file is part of Mark's Code Fractal CFLib.
+ *
+ *	Mark's Code Fractal CFLib is available under dual commercial license from
+ *	Mark Stephen Sobkow, or under the terms of the GNU Library General Public License,
+ *	Version 3 or later.
+ *
+ *	Mark's Code Fractal CFLib is free software: you can redistribute it and/or
+ *	modify it under the terms of the GNU Library General Public License as published by
+ *	the Free Software Foundation, either version 3 of the License, or
+ *	(at your option) any later version.
+ *
+ *	Mark's Code Fractal CFLib is distributed in the hope that it will be useful,
+ *	but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *	GNU Library General Public License for more details.
+ *
+ *	You should have received a copy of the GNU Library General Public License
+ *	along with Mark's Code Fractal CFLib.  If not, see &lt;https://www.gnu.org/licenses/&gt;.
+ *
+ *	If you wish to modify and use this code without publishing your changes in order to
+ *	tie it to proprietary code, please contact Mark Stephen Sobkow
+ *	for a commercial license at mark.sobkow@gmail.com
+ */
+
+package server.markhome.mcf.v3_1.cflib.javafx;
+
+import java.time.*;
+import javafx.geometry.Pos;
+
+import server.markhome.mcf.v3_1.cflib.*;
+import server.markhome.mcf.v3_1.cflib.inz.Inz;
+import server.markhome.mcf.v3_1.cflib.xml.CFLibXmlUtil;
+
+public class CFTZDateEditor
+extends CFTextField
+{
+	public final static LocalDate MIN_VALUE = CFLibXmlUtil.parseTZDate("0000-00-00+00:00");
+	public final static LocalDate MAX_VALUE = CFLibXmlUtil.parseTZDate("9999-11-31+00:00" );
+
+	protected LocalDate curValue = null;
+
+	protected LocalDate minValue = MIN_VALUE;
+	protected LocalDate maxValue = MAX_VALUE;
+
+	protected String fieldNameInzTag = null;
+	
+	public String getFieldNameInzTag() {
+		return( fieldNameInzTag );
+	}
+	
+	public void setFieldNameInzTag( String value ) {
+		if( ( value == null ) || ( value.length() <= 0 ) ) {
+			fieldNameInzTag = null;
+		}
+		else {
+			fieldNameInzTag = value;
+		}
+	}
+
+	public CFTZDateEditor() {
+		super();
+		setAlignment( Pos.CENTER_LEFT );
+		setMinWidth( 160 );
+		setMaxWidth( 160 );
+		setPrefWidth( 160 );
+		setMinHeight( 25 );
+		setMaxHeight( 25 );
+		setPrefHeight( 25 );
+	}
+
+	public LocalDate getMinValue() {
+		return( minValue );
+	}
+	
+	public void setMinValue( LocalDate value ) {
+		minValue = value;
+	}
+	
+	public LocalDate getMaxValue() {
+		return( maxValue );
+	}
+	
+	public void setMaxValue( LocalDate value ) {
+		maxValue = value;
+	}
+
+	public boolean hasValue() {
+		boolean retval;
+		String text = getText();
+		if( ( text == null ) || ( text.length() <= 0 ) ) {
+			retval = false;
+		}
+		else {
+			retval = true;
+		}
+		return( retval );
+	}
+	
+	public boolean isEditValid() {
+		String text = getText();
+		if( ( text == null ) || ( text.length() <= 0 ) ) {
+			curValue = null;
+			return( true );
+		}
+		curValue = null;
+		curValue = CFLibXmlUtil.parseTZDate(  Inz.x(fieldNameInzTag), Inz.s(fieldNameInzTag), text );
+		return( true );
+	}
+
+	public void setTZDateValue( LocalDate value ) {
+		curValue = value;
+		if( curValue != null ) {
+			String str = CFLibXmlUtil.formatTZDate(value );
+			setText( str );
+		}
+		else {
+			setText( "" );
+		}
+	}
+	
+	public LocalDate getTZDateValue() {
+		final String S_ProcName = "getTZDateValue";
+		if( ! hasValue() ) {
+			return( null );
+		}
+		else if( isEditValid() ) {
+			return( curValue );
+		}
+		else {
+			throw new CFLibInvalidArgumentException( Inz.x(fieldNameInzTag),
+				Inz.s(fieldNameInzTag),
+				S_ProcName,
+				0,
+				"text",
+				getText(),
+				getText() );
+		}
+	}
+}
